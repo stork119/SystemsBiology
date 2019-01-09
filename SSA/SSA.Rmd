@@ -1,0 +1,171 @@
+---
+title: "Gillespie Algorithm"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document: default
+---
+# Initialisation
+
+Firstly, we need to install required packages.
+
+```{r echo=FALSE}
+require(GillespieSSA)
+require(ggplot2)
+require(dplyr)
+require(foreach)
+require(reshape2)
+```
+
+To do this you should use function `install.packages(package_name)`.
+
+# Gene expression model. 
+
+We will consider simple GEM defined as:
+
+dm/dt = Sm - km * m
+dn/dt = Sn * m - kn * n
+
+To simulate model using Gillespie Algorithm we will use ssa function implemented in package GillespieSSA. Let's read the ssa's documentation `?ssa`.
+
+> To simulate model we need to define:
+
+* nu --- state change matrix (stoichometric matrix)
+    * rows corresponds to variables 
+    * columns corresponds to reactions
+    * each element e_{i,j} of matrix tells what is an effect of reaction j on variable i 
+* a --- propensity vector - prawdopodobienstwo przejscia pomiedzy stanami reakcji
+
+```{r}
+nu <- 
+  matrix(
+    c(1,  -1, 0, 0, 
+      0, 0,  1, -1),
+  nrow = 2,
+  byrow = TRUE)
+a <- 
+  c("Sm", 
+    "km*m",
+    "Sn*m",
+    "kn*n")
+```
+
+> Moreover we need to initiate parameters and variables state:
+
+* x0 --- initial variables state 
+* param --- vector of parameters values
+* tf --- time of simulations
+
+
+```{r}
+x0 <- c(m = 1, n = 0)
+parms <- c(Sm = 0.05, km = 0.005, Sn = 0.05, kn = 0.001)
+tf <- 5000
+```
+
+Model simulation:
+```{r}
+method <- "D"
+simName <- "Gene Expression Model"
+out <- ssa(x0 = x0,
+           a = a,
+           nu = nu,
+           parms = parms,
+           tf = tf,
+           method = method,
+           simName = simName,
+           verbose = FALSE,
+           consoleInterval = 1)
+```
+
+
+```{r}
+data <- data.frame(out$data)
+colnames(data)[1] <- "t"
+head(data)
+```
+Plotting mRNA
+```{r}
+g <- 
+  ggplot(
+    data = data,
+    mapping = aes(x = t, y = m)) +
+  geom_line() +
+  xlab("mRNA molecules number") +
+  coord_cartesian(ylim = c(0, 1.2*max(data$m)))
+print(g)
+```
+Plotting mRNA and protein in time
+```{r}
+data <- data.frame(out$data)
+colnames(data)[1] <- "t"
+data.long <- 
+  data %>%
+  reshape2::melt(id = "t")
+g <- 
+  ggplot(
+    data = data.long,
+    mapping = aes(x = t, y = value, group = variable, color = variable)) +
+  geom_line() +
+  xlab("Molecules number") +
+  coord_cartesian(ylim = c(0, 1.2*max(data$m, data$n)))
+print(g)
+```
+
+# Task 1  
+ Consider GEM with different initiate state values.
+   
+   * Initiate  in steady state
+   * Initiate state m = 1, n = 0
+   * Initiate state m = 10, n = 0
+ 
+ Prepare code that simulates model multiple times and plot trajectories of molecules numbers.  
+  
+  * Calculate and plot mean and standard deviation of molecules in time. For mRNA compare results in steady state  with analytical solution of master equations.
+  *  Calculate time of convergence to the steady state.
+  *  Plot mRNA vs protein
+ 
+ 
+# Task 2
+> Lottka-Volter Model
+
+ * R1: A + X --> 2X  
+ * R2: X + Y --> 2Y
+ * R3: Y --> *
+ 
+ rates: k1, k2, k3
+ A - some paramter
+ 
+ * Calulcate the propensity function and  stechiometric matrix
+ * Caluclate steady state 
+ * Simulate model multiple times starting from different states. What is a time of convergance ?
+ * Prepare plot presenting population of rabbits vs foxes
+
+# Task 3 
+Zaimplementuj algorytm Gillespiego w dowolnym języku i zrób symulację następującego układu:
+
+A + B → C
+
+D → A + B
+
+→ E
+
+E + C → D
+
+A →
+
+B →
+
+C →
+
+D →
+
+E →
+
+i znajdź taki rozkład prawdopodobieństw poszczególnych reakcji, który skutkuje dwoma scenariuszami:
+
+układ znajduje się mniej więcej w stanie stacjonarnym
+układ rośnie w nieskończoność
+Pokaż wykresy stężeń dla wszystkich związków.
+
+Jako stan początkowy przyjmij losowe ilości cząsteczek wszystkich związków z przedziału <2,10>.
