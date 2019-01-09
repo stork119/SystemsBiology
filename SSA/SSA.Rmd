@@ -133,8 +133,12 @@ print(g)
  * R2: X + Y --> 2Y
  * R3: Y --> *
  
- rates: k1, k2, k3
- A - some paramter
+ X -- rabbits 
+ Y -- foxes 
+ 
+ 'reaction' rates: k1, k2, k3
+ 
+ A -  paramter
  
  * Calulcate the propensity function and  stechiometric matrix
  * Caluclate steady state 
@@ -142,7 +146,7 @@ print(g)
  * Prepare plot presenting population of rabbits vs foxes
 
 # Task 3 
-Zaimplementuj algorytm Gillespiego w dowolnym języku i zrób symulację następującego układu:
+Zrób symulację następującego układu:
 
 A + B → C
 
@@ -152,15 +156,15 @@ D → A + B
 
 E + C → D
 
-A →
+A → *
 
-B →
+B → *
 
-C →
+C → *
 
-D →
+D → *
 
-E →
+E → *
 
 i znajdź taki rozkład prawdopodobieństw poszczególnych reakcji, który skutkuje dwoma scenariuszami:
 
