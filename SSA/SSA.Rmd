@@ -9,7 +9,7 @@ output:
 
 Firstly, we need to install required packages.
 
-```{r echo=FALSE}
+```{r message=FALSE}
 require(GillespieSSA)
 require(ggplot2)
 require(dplyr)
